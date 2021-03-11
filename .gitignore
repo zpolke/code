@@ -4,3 +4,6 @@ __pycache__
 *.egg-info
 **/venv/**
 **/.idea/**
+src/build/lib/allocation/__init__.py
+src/build/lib/allocation/config.py
+src/dist/allocation-0.1-py3.8.egg

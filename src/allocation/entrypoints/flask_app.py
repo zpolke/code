@@ -28,14 +28,16 @@ def add_batch():
 
 @app.route("/allocate", methods=["POST"])
 def allocate_endpoint():
+    line = model.OrderLine(
+        request.json["orderid"], request.json["sku"], request.json["qty"]
+    )
     try:
-        batchref = services.allocate(
-            request.json["orderid"],
-            request.json["sku"],
-            request.json["qty"],
-            unit_of_work.SqlAlchemyUnitOfWork(),
+        uow = unit_of_work.SqlAlchemyUnitOfWork()
+        batchref = services.allocate(line, uow)
+    except:
+        send_mail(
+            "out of stock", "stock_admin@made.com", f"{line.orderid} - {line.sku}"
         )
-    except (model.OutOfStock, services.InvalidSku) as e:
         return {"message": str(e)}, 400
 
     return {"batchref": batchref}, 201

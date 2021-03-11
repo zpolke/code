@@ -1,6 +1,7 @@
 import pytest
 import model
 import repository
+import services
 
 
 class FakeRepository(repository.AbstractRepository):
@@ -25,7 +26,7 @@ class FakeSession:
 
 
 def test_commits():
-    line = model.Orderline("o1", "OMINOUS-MIRROR", 10)
+    line = model.OrderLine("o1", "OMINOUS-MIRROR", 10)
     batch = model.Batch("b1", "OMINOUS-MIRROR", 100, eta=None)
     repo = FakeRepository([batch])
     session = FakeSession()

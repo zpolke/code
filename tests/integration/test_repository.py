@@ -11,7 +11,7 @@ def test_repository_can_save_a_batch(session):
     session.commit()
 
     rows = session.execute(
-        'SELECT reference, sku, _purchased_quantity, eta FROM "batches"'
+        'SELECT reference, sku, _purchased_quantity, eta FROM "products"'
     )
     assert list(rows) == [("batch1", "RUSTY-SOAPDISH", 100, None)]
 
@@ -30,12 +30,12 @@ def insert_order_line(session):
 
 def insert_batch(session, batch_id):
     session.execute(
-        "INSERT INTO batches (reference, sku, _purchased_quantity, eta)"
+        "INSERT INTO products (reference, sku, _purchased_quantity, eta)"
         ' VALUES (:batch_id, "GENERIC-SOFA", 100, null)',
         dict(batch_id=batch_id),
     )
     [[batch_id]] = session.execute(
-        'SELECT id FROM batches WHERE reference=:batch_id AND sku="GENERIC-SOFA"',
+        'SELECT id FROM products WHERE reference=:batch_id AND sku="GENERIC-SOFA"',
         dict(batch_id=batch_id),
     )
     return batch_id
@@ -62,6 +62,4 @@ def test_repository_can_retrieve_a_batch_with_allocations(session):
     assert retrieved == expected  # Batch.__eq__ only compares reference
     assert retrieved.sku == expected.sku
     assert retrieved._purchased_quantity == expected._purchased_quantity
-    assert retrieved._allocations == {
-        model.OrderLine("order1", "GENERIC-SOFA", 12),
-    }
+    assert retrieved._allocations == {model.OrderLine("order1", "GENERIC-SOFA", 12)}

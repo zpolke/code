@@ -16,7 +16,7 @@ order_lines = Table(
 )
 
 batches = Table(
-    "batches",
+    "products",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("reference", String(255)),
@@ -30,7 +30,7 @@ allocations = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("orderline_id", ForeignKey("order_lines.id")),
-    Column("batch_id", ForeignKey("batches.id")),
+    Column("batch_id", ForeignKey("products.id")),
 )
 
 
@@ -41,9 +41,7 @@ def start_mappers():
         batches,
         properties={
             "_allocations": relationship(
-                lines_mapper,
-                secondary=allocations,
-                collection_class=set,
+                lines_mapper, secondary=allocations, collection_class=set
             )
         },
     )

@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, clear_mappers
 
-from orm import metadata, start_mappers
+from adapters.orm import metadata, start_mappers
 import config
 
 
@@ -87,17 +87,14 @@ def add_stock(postgres_session):
 
     for batch_id in batches_added:
         postgres_session.execute(
-            "DELETE FROM allocations WHERE batch_id=:batch_id",
-            dict(batch_id=batch_id),
+            "DELETE FROM allocations WHERE batch_id=:batch_id", dict(batch_id=batch_id)
         )
         postgres_session.execute(
-            "DELETE FROM batches WHERE id=:batch_id",
-            dict(batch_id=batch_id),
+            "DELETE FROM batches WHERE id=:batch_id", dict(batch_id=batch_id)
         )
     for sku in skus_added:
         postgres_session.execute(
-            "DELETE FROM order_lines WHERE sku=:sku",
-            dict(sku=sku),
+            "DELETE FROM order_lines WHERE sku=:sku", dict(sku=sku)
         )
         postgres_session.commit()
 

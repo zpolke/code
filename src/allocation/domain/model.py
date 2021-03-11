@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from typing import Optional, List, Set
-import events
+import allocation.domain.events
 
 
 class OutOfStock(Exception):

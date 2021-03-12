@@ -39,9 +39,7 @@ class Product:
         while batch.available_quantity < 0:
             line = batch.deallocate_one()
             self.events.append(
-                allocation.domain.commands.AllocationRequired(
-                    line.orderid, line.sku, line.qty
-                )
+                allocation.domain.commands.Allocate(line.orderid, line.sku, line.qty)
             )
 
 

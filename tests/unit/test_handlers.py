@@ -42,9 +42,7 @@ class TestAddBatch:
     def test_for_new_product(self):
         uow = FakeUnitOfWork()
         messagebus.handle(
-            allocation.domain.commands.BatchCreated(
-                "b1", "CRUNCHY-ARMCHAIR", 100, None
-            ),
+            allocation.domain.commands.CreateBatch("b1", "CRUNCHY-ARMCHAIR", 100, None),
             uow,
         )
         assert uow.products.get("CRUNCHY-ARMCHAIR") is not None
@@ -55,7 +53,7 @@ class TestChangeBatchQuantity:
     def test_changes_available_quantity(self):
         uow = FakeUnitOfWork()
         messagebus.handle(
-            allocation.domain.commands.BatchCreated(
+            allocation.domain.commands.CreateBatch(
                 "batch1", "ADORABLE-SETTEE", 100, None
             ),
             uow,
@@ -63,25 +61,21 @@ class TestChangeBatchQuantity:
         [batch] = uow.products.get(sku="ADORABLE-SETTEE").batches
         assert batch.available_quantity == 100
         messagebus.handle(
-            allocation.domain.commands.BatchQuantityChanged("batch1", 50), uow
+            allocation.domain.commands.ChangeBatchQuantity("batch1", 50), uow
         )
         assert batch.available_quantity == 50
 
     def test_reallocates_if_necessary(self):
         uow = FakeUnitOfWork()
         event_history = [
-            allocation.domain.commands.BatchCreated(
+            allocation.domain.commands.CreateBatch(
                 "batch1", "INDIFFERENT-TABLE", 50, None
             ),
-            allocation.domain.commands.BatchCreated(
+            allocation.domain.commands.CreateBatch(
                 "batch2", "INDIFFERENT-TABLE", 50, date.today()
             ),
-            allocation.domain.commands.AllocationRequired(
-                "order1", "INDIFFERENT-TABLE", 20
-            ),
-            allocation.domain.commands.AllocationRequired(
-                "order2", "INDIFFERENT-TABLE", 20
-            ),
+            allocation.domain.commands.Allocate("order1", "INDIFFERENT-TABLE", 20),
+            allocation.domain.commands.Allocate("order2", "INDIFFERENT-TABLE", 20),
         ]
         for e in event_history:
             messagebus.handle(e, uow)
@@ -90,7 +84,7 @@ class TestChangeBatchQuantity:
         assert batch2.available_quantity == 50
 
         messagebus.handle(
-            allocation.domain.commands.BatchQuantityChanged("batch1", 25), uow
+            allocation.domain.commands.ChangeBatchQuantity("batch1", 25), uow
         )
 
         # order1 or order2 will be deallocated, so we'll have 25-20
